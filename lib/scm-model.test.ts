@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeLeadtimeGap } from './scm-model.ts';
+import { normalizeLeadtimeGap, normalizeStockoutRisk } from './scm-model.ts';
 
 test('normalizes analytics leadtime rows into the screen model', () => {
   const result = normalizeLeadtimeGap({
@@ -52,4 +52,58 @@ test('reads the real analytics.v_leadtime_gap column names', () => {
     p80: 33,
     gap: 8,
   });
+});
+
+test('normalizes stockout risk rows and preserves nullable values', () => {
+  const result = normalizeStockoutRisk({
+    item_id: 'ITEM012',
+    item_name: '정착 유닛',
+    supplier_name: 'Fujifilm BI Japan',
+    current_stock: 362,
+    inbound_qty: 722,
+    available_qty: 1084,
+    daily_usage_avg: 60.22,
+    planned_lead_time: 18,
+    stockout_days: 18,
+    stockout_date: '2026-09-18',
+    risk_status: 'CRITICAL',
+    reason: null,
+  });
+
+  assert.deepEqual(result, {
+    itemId: 'ITEM012',
+    itemName: '정착 유닛',
+    supplier: 'Fujifilm BI Japan',
+    currentStock: 362,
+    inboundQty: 722,
+    availableQty: 1084,
+    dailyUsageAvg: 60.22,
+    plannedLeadTime: 18,
+    stockoutDays: 18,
+    stockoutDate: '2026-09-18',
+    riskStatus: 'CRITICAL',
+    reason: null,
+  });
+});
+
+test('normalizes unknown stockout reasons without inventing numbers', () => {
+  const result = normalizeStockoutRisk({
+    item_id: 'ITEM020',
+    item_name: '신규 품목',
+    supplier_id: 'SUP013',
+    current_stock: 0,
+    inbound_qty: 0,
+    available_qty: 0,
+    daily_usage_avg: null,
+    planned_lead_time: null,
+    stockout_days: null,
+    stockout_date: null,
+    risk_status: 'UNKNOWN',
+    reason: 'NO_USAGE',
+  });
+
+  assert.equal(result.stockoutDays, null);
+  assert.equal(result.stockoutDate, null);
+  assert.equal(result.riskStatus, 'UNKNOWN');
+  assert.equal(result.reason, 'NO_USAGE');
 });

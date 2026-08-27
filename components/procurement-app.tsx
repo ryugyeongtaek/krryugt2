@@ -61,7 +61,11 @@ export default function ProcurementApp() {
           })}
           <Link className="nav-button" href="/analysis/leadtime">
             <span className="nav-number"><BarChart3 size={13} /></span>
-            <span>분석</span>
+            <span>리드타임 분석</span>
+          </Link>
+          <Link className="nav-button" href="/analysis/stockout">
+            <span className="nav-number"><AlertTriangle size={13} /></span>
+            <span>소진 위험 분석</span>
           </Link>
         </nav>
         <div className="sidebar-foot"><b>2026년 09월 발주계획</b><br />로컬 프로토타입 · Phase 1<br />상세 계산·저장은 다음 단계에서 연결됩니다.</div>

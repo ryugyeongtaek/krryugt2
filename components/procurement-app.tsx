@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { AlertTriangle, BarChart3, Boxes, Check, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardCheck, FileSpreadsheet, FileText, Gauge, Layers3, PackageCheck, Settings2, ShoppingCart, Upload, Workflow, Wrench } from 'lucide-react';
 import DashboardStep from '@/components/workflow/dashboard-step';
 import DemandStep from '@/components/workflow/demand-step';
@@ -58,6 +59,10 @@ export default function ProcurementApp() {
               <span>{step.label}</span>
             </button>;
           })}
+          <Link className="nav-button" href="/analysis/leadtime">
+            <span className="nav-number"><BarChart3 size={13} /></span>
+            <span>분석</span>
+          </Link>
         </nav>
         <div className="sidebar-foot"><b>2026년 09월 발주계획</b><br />로컬 프로토타입 · Phase 1<br />상세 계산·저장은 다음 단계에서 연결됩니다.</div>
       </aside>

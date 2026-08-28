@@ -52,3 +52,17 @@
 .button-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
 .button-row form { display: flex; align-items: center; gap: 10px; }
 .import-preview { max-height: 260px; overflow: auto; padding: 12px; color: var(--ink); background: var(--surface-subtle); border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
+.model-registry-table { table-layout: fixed; min-width: 1120px; }
+.model-registry-table th:nth-child(1) { width: 16%; }
+.model-registry-table th:nth-child(2) { width: 15%; }
+.model-registry-table th:nth-child(3) { width: 12%; }
+.model-registry-table th:nth-child(4) { width: 8%; }
+.model-registry-table th:nth-child(5) { width: 10%; }
+.model-registry-table th:nth-child(6) { width: 19%; }
+.model-registry-table th:nth-child(7) { width: 20%; }
+.model-registry-table td { vertical-align: middle; overflow-wrap: anywhere; }
+.model-demand-types { font-size: 12px; line-height: 1.5; }
+.model-config-form { display: grid; grid-template-columns: minmax(180px, 1fr) auto; align-items: center; gap: 8px; width: 100%; }
+.model-config-form textarea { box-sizing: border-box; width: 100%; min-height: 58px; padding: 8px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px; font: 12px/1.35 var(--font-mono, monospace); resize: vertical; }
+.model-config-form .button { white-space: nowrap; padding-inline: 12px; }
+@media (max-width: 1200px) { .model-registry-table { min-width: 980px; } .model-config-form { grid-template-columns: 1fr; } .model-config-form .button { justify-self: start; } }

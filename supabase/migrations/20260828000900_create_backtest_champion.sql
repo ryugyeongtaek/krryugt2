@@ -107,14 +107,17 @@ begin
       from core.forecast_result fr
       join actuals a on a.item_id = fr.item_id and a.period = fr.period
       where fr.run_id = p_forecast_run_id and fr.p50 is not null
+    ), expected as (
+      select distinct model_id, model_version, item_id from core.forecast_result where run_id = p_forecast_run_id
     ), metrics as (
-      select model_id, model_version, item_id, count(*)::integer as n_periods,
-        case when sum(actual_qty) = 0 then null else sum(abs(predicted_qty - actual_qty)) / nullif(sum(actual_qty),0) end as wape,
-        avg(abs(predicted_qty - actual_qty) / nullif(abs(actual_qty),0)) filter (where actual_qty <> 0) as mape,
-        avg(predicted_qty - actual_qty) as bias,
-        sqrt(avg(power(predicted_qty - actual_qty, 2))) as rmse,
-        avg(abs(predicted_qty - actual_qty)) as mae
-      from matched group by model_id, model_version, item_id
+      select e.model_id, e.model_version, e.item_id, count(m.period)::integer as n_periods,
+        case when sum(m.actual_qty) = 0 then null else sum(abs(m.predicted_qty - m.actual_qty)) / nullif(sum(m.actual_qty),0) end as wape,
+        avg(abs(m.predicted_qty - m.actual_qty) / nullif(abs(m.actual_qty),0)) filter (where m.actual_qty <> 0) as mape,
+        avg(m.predicted_qty - m.actual_qty) as bias,
+        sqrt(avg(power(m.predicted_qty - m.actual_qty, 2))) as rmse,
+        avg(abs(m.predicted_qty - m.actual_qty)) as mae
+      from expected e left join matched m on m.model_id=e.model_id and m.model_version=e.model_version and m.item_id=e.item_id
+      group by e.model_id, e.model_version, e.item_id
     )
     insert into core.model_performance (backtest_run_id, forecast_run_id, model_id, model_version, item_id, n_periods, wape, mape, bias, rmse, mae, calculation_status, reason_code)
     select v_backtest_id, p_forecast_run_id, m.model_id, m.model_version, m.item_id, m.n_periods, m.wape, m.mape, m.bias, m.rmse, m.mae,

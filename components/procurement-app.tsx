@@ -9,6 +9,7 @@ import MasterStep from '@/components/workflow/master-step';
 import CalculationStep from '@/components/workflow/calculation-step';
 import ReportStep from '@/components/workflow/report-step';
 import Sidebar from '@/components/shell/sidebar';
+import { logoutAction } from '@/app/(auth)/login/logout';
 
 export type StepId = 'dashboard' | 'demand' | 'supply' | 'master' | 'calculation' | 'report';
 
@@ -48,7 +49,7 @@ export default function ProcurementApp() {
       <main className="main">
         <header className="topbar">
           <div><div className="eyebrow">MONTHLY PROCUREMENT CONTROL</div><h1>{current.label}</h1></div>
-          <div className="top-meta"><span className="local-badge">LOCAL PROTOTYPE</span><span>기준월도 <b>2026.09</b></span></div>
+          <div className="top-meta"><span className="local-badge">LOCAL PROTOTYPE</span><span>기준월도 <b>2026.09</b></span><form action={logoutAction}><button className="button quiet" type="submit">로그아웃</button></form></div>
         </header>
         <div className="content">
           <div className="progress-wrap">

@@ -30,3 +30,16 @@ test('기간 경계는 TypeScript 코드에 날짜 리터럴로 고정되지 않
     .join('\n');
   assert.doesNotMatch(appFiles, /20\d{2}-\d{2}-\d{2}/);
 });
+
+test('Import 파이프라인은 서버 파싱·staging·승인 import 계약을 가진다', () => {
+  const parseSource = readFileSync(join(root, 'lib/import/parse.ts'), 'utf8');
+  const repositorySource = readFileSync(join(root, 'lib/import/repository.ts'), 'utf8');
+  const migrationSource = readFileSync(join(root, 'supabase/migrations/20260828000400_create_import_pipeline.sql'), 'utf8');
+  assert.match(parseSource, /Papa\.parse/);
+  assert.match(parseSource, /XLSX\.read/);
+  assert.match(repositorySource, /stage_import/);
+  assert.match(repositorySource, /import_batch/);
+  assert.match(migrationSource, /core\.import_staging/);
+  assert.match(migrationSource, /core\.validation_error/);
+  assert.match(migrationSource, /core\.rollback_batch/);
+});

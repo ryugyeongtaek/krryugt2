@@ -47,3 +47,8 @@
 .auth-link { display: block; margin-top: 18px; color: var(--primary-strong); font-size: 13px; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
 .admin-user-form { display: flex; align-items: center; gap: 6px; }
 .admin-user-form select { min-height: 34px; padding: 4px 7px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px; }
+.import-form { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.import-form select, .import-form input[type="file"] { min-height: 38px; padding: 7px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; }
+.button-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.button-row form { display: flex; align-items: center; gap: 10px; }
+.import-preview { max-height: 260px; overflow: auto; padding: 12px; color: var(--ink); background: var(--surface-subtle); border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }

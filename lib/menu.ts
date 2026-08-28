@@ -19,6 +19,7 @@ export const menuItems: MenuItem[] = [
   { id: 'admin', label: '관리자 설정', href: '/admin', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
   { id: 'admin-users', label: '사용자 관리', href: '/admin/users', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
   { id: 'admin-forecast-settings', label: 'Forecast 설정', href: '/admin/forecast-settings', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
+  { id: 'admin-data-management', label: '데이터 관리', href: '/admin/data-management', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
 ];
 
 export function getMenuItems(role: MenuRole): MenuItem[] {

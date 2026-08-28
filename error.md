@@ -16,3 +16,8 @@
 - 증상: `email rate limit exceeded`
 - 원인: 짧은 시간에 동일 프로젝트에서 보낼 수 있는 인증 이메일 횟수를 초과함.
 - 해결: 제한 시간이 지난 뒤 재시도하거나 Supabase Auth 이메일 발송 설정/SMTP를 확인함.
+
+## 비밀번호 링크 `otp_expired` 및 로컬 Internal Server Error
+
+- 원인: 재설정 링크가 만료되었고, 동시에 `npm run dev`와 `npm run build`가 `.next` 산출물을 함께 사용해 개발 서버 산출물이 깨짐.
+- 해결: 개발 서버를 종료한 뒤 `.next`를 재생성하고 `npm run dev`만 실행함. 만료 링크는 로그인 화면에서 재설정 안내를 표시하도록 처리함.

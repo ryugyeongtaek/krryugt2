@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from './supabase';
-import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeModelPerformance, normalizeChampionModel, normalizeComparisonPoint, normalizeLeadtimeGap, normalizeStockoutRisk, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type ModelPerformance, type ChampionModel, type ComparisonPoint, type LeadtimeGap, type StockoutRisk } from './scm-model';
+import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeModelPerformance, normalizeChampionModel, normalizeComparisonPoint, normalizeLeadtimeGap, normalizeStockoutRisk, normalizeInventoryProjection, normalizeLeadtimePolicy, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type ModelPerformance, type ChampionModel, type ComparisonPoint, type LeadtimeGap, type StockoutRisk, type InventoryProjection, type LeadtimePolicy } from './scm-model';
 
 export async function getDemandProfiles(): Promise<{ rows: DemandProfile[]; error: string | null }> {
   try {
@@ -54,6 +54,24 @@ export async function getStockoutRisks(): Promise<{ rows: StockoutRisk[]; error:
   } catch (error) {
     return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' };
   }
+}
+
+export async function getInventoryProjections(): Promise<{ rows: InventoryProjection[]; error: string | null }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.schema('analytics').from('v_inventory_projection').select('*').order('item_id').order('period');
+    if (error) return { rows: [], error: error.message };
+    return { rows: (data ?? []).map((row) => normalizeInventoryProjection(row as Record<string, unknown>)), error: null };
+  } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getLeadtimePolicies(): Promise<{ rows: LeadtimePolicy[]; error: string | null }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.schema('analytics').from('v_leadtime_policy').select('*').order('supplier_id').order('item_id');
+    if (error) return { rows: [], error: error.message };
+    return { rows: (data ?? []).map((row) => normalizeLeadtimePolicy(row as Record<string, unknown>)), error: null };
+  } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }
 
 export async function getModelConfigs(): Promise<{ rows: ModelConfig[]; error: string | null }> {

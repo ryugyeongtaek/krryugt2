@@ -8,8 +8,8 @@ export type LeadtimeGap = {
   gap: number | null;
 };
 
-export type StockoutRiskStatus = 'SAFE' | 'CRITICAL' | 'UNKNOWN';
-export type StockoutRiskReason = 'NO_USAGE' | 'NO_LEADTIME' | null;
+export type StockoutRiskStatus = 'SAFE' | 'WARNING' | 'CRITICAL' | 'CALCULATION_UNAVAILABLE' | 'UNKNOWN';
+export type StockoutRiskReason = 'NO_USAGE_HISTORY' | 'NO_LEADTIME' | 'NO_INVENTORY_DATA' | 'INSUFFICIENT_SAMPLE' | 'NO_FORECAST' | 'NO_USAGE' | null;
 
 export type StockoutRisk = {
   itemId: string;
@@ -24,6 +24,49 @@ export type StockoutRisk = {
   stockoutDate: string | null;
   riskStatus: StockoutRiskStatus;
   reason: StockoutRiskReason;
+  period?: string | null;
+  scheduledReceipt?: number | null;
+  confirmedSalesOrder?: number | null;
+  softAllocation?: number | null;
+  forecastDemand?: number | null;
+  endingProjectedInventory?: number | null;
+  monthsOfSupply?: number | null;
+  softAllocationStatus?: string | null;
+};
+
+export type InventoryProjection = {
+  itemId: string;
+  period: string;
+  beginningInventory: number | null;
+  scheduledReceipt: number | null;
+  confirmedSalesOrder: number | null;
+  softAllocation: number | null;
+  forecastDemand: number | null;
+  endingProjectedInventory: number | null;
+  stockoutPeriod: string | null;
+  daysOfSupply: number | null;
+  monthsOfSupply: number | null;
+  riskStatus: StockoutRiskStatus;
+  reasonCode: StockoutRiskReason;
+  effectiveLeadTime: number | null;
+  softAllocationStatus: string | null;
+};
+
+export type LeadtimePolicy = {
+  policyId: string | null;
+  itemId: string | null;
+  supplierId: string | null;
+  supplierName: string | null;
+  actualLeadTime: number | null;
+  p50: number | null;
+  p80: number | null;
+  p90: number | null;
+  sampleCount: number;
+  confirmedLeadTime: number | null;
+  effectiveLeadTime: number | null;
+  effectiveFrom: string | null;
+  changedBy: string | null;
+  reason: string | null;
 };
 
 export type DemandType = 'SMOOTH' | 'INTERMITTENT' | 'ERRATIC' | 'LUMPY';
@@ -253,16 +296,16 @@ export function normalizeModelConfig(row: Record<string, unknown>): ModelConfig 
 
 function normalizeRiskStatus(raw: unknown): StockoutRiskStatus {
   const status = String(raw ?? '').toUpperCase();
-  return status === 'SAFE' || status === 'CRITICAL' ? status : 'UNKNOWN';
+  return status === 'SAFE' || status === 'WARNING' || status === 'CRITICAL' || status === 'CALCULATION_UNAVAILABLE' ? status : 'UNKNOWN';
 }
 
 function normalizeStockoutReason(raw: unknown): StockoutRiskReason {
   const reason = String(raw ?? '').toUpperCase();
-  return reason === 'NO_USAGE' || reason === 'NO_LEADTIME' ? reason : null;
+  return ['NO_USAGE_HISTORY','NO_LEADTIME','NO_INVENTORY_DATA','INSUFFICIENT_SAMPLE','NO_FORECAST','NO_USAGE'].includes(reason) ? reason as StockoutRiskReason : null;
 }
 
 export function normalizeStockoutRisk(row: Record<string, unknown>): StockoutRisk {
-  return {
+  const result: StockoutRisk = {
     itemId: stringValue(row, ['item_id', 'item', '품목코드']) ?? '미정',
     itemName: stringValue(row, ['item_name', '품목명']) ?? '미정',
     supplier: stringValue(row, ['supplier_name', 'supplier', '법인', '공급처', '공급업체명']) ?? '미정',
@@ -276,4 +319,34 @@ export function normalizeStockoutRisk(row: Record<string, unknown>): StockoutRis
     riskStatus: normalizeRiskStatus(value(row, ['risk_status', 'status', '위험상태'])),
     reason: normalizeStockoutReason(value(row, ['reason', '사유'])),
   };
+  if ('period' in row) result.period = stringValue(row, ['period']);
+  if ('scheduled_receipt' in row) result.scheduledReceipt = numberValue(row, ['scheduled_receipt']);
+  if ('confirmed_sales_order' in row) result.confirmedSalesOrder = numberValue(row, ['confirmed_sales_order']);
+  if ('soft_allocation' in row) result.softAllocation = numberValue(row, ['soft_allocation']);
+  if ('forecast_demand' in row) result.forecastDemand = numberValue(row, ['forecast_demand']);
+  if ('ending_projected_inventory' in row) result.endingProjectedInventory = numberValue(row, ['ending_projected_inventory']);
+  if ('months_of_supply' in row) result.monthsOfSupply = numberValue(row, ['months_of_supply']);
+  if ('soft_allocation_status' in row) result.softAllocationStatus = stringValue(row, ['soft_allocation_status']);
+  return result;
+}
+
+export function normalizeInventoryProjection(row: Record<string, unknown>): InventoryProjection {
+  return {
+    itemId: stringValue(row, ['item_id']) ?? '미정', period: stringValue(row, ['period']) ?? '미정',
+    beginningInventory: numberValue(row, ['beginning_inventory']), scheduledReceipt: numberValue(row, ['scheduled_receipt']),
+    confirmedSalesOrder: numberValue(row, ['confirmed_sales_order']), softAllocation: numberValue(row, ['soft_allocation']),
+    forecastDemand: numberValue(row, ['forecast_demand']), endingProjectedInventory: numberValue(row, ['ending_projected_inventory']),
+    stockoutPeriod: stringValue(row, ['stockout_period']), daysOfSupply: numberValue(row, ['days_of_supply']),
+    monthsOfSupply: numberValue(row, ['months_of_supply']), riskStatus: normalizeRiskStatus(row.risk_status),
+    reasonCode: normalizeStockoutReason(row.reason_code), effectiveLeadTime: numberValue(row, ['effective_lead_time']),
+    softAllocationStatus: stringValue(row, ['soft_allocation_status']),
+  };
+}
+
+export function normalizeLeadtimePolicy(row: Record<string, unknown>): LeadtimePolicy {
+  return { policyId: stringValue(row, ['policy_id']), itemId: stringValue(row, ['item_id']), supplierId: stringValue(row, ['supplier_id']),
+    supplierName: stringValue(row, ['supplier_name']), actualLeadTime: numberValue(row, ['actual_lead_time']), p50: numberValue(row, ['p50_days','p50']),
+    p80: numberValue(row, ['p80_days','p80']), p90: numberValue(row, ['p90_days','p90']), sampleCount: numberValue(row, ['n_samples']) ?? 0,
+    confirmedLeadTime: numberValue(row, ['confirmed_lead_time']), effectiveLeadTime: numberValue(row, ['effective_lead_time']),
+    effectiveFrom: stringValue(row, ['effective_from']), changedBy: stringValue(row, ['changed_by']), reason: stringValue(row, ['reason']) };
 }

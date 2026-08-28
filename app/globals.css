@@ -1,19 +1,35 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap");
+@import url("../styles/shell.css");
+@import url("../styles/components.css");
+@import url("../styles/chart.css");
 
 :root {
-  --ink: #182230;
-  --muted: #718096;
-  --line: #e3e8ef;
-  --canvas: #f5f7fb;
+  --ink: #17352f;
+  --muted: #6d827b;
+  --line: #dbeae4;
+  --line-strong: #bdd8ce;
+  --canvas: #f4faf7;
   --surface: #ffffff;
-  --navy: #17365d;
-  --blue: #2f6fed;
-  --pale-blue: #edf4ff;
-  --green: #1f9d68;
-  --pale-green: #eaf8f1;
+  --surface-subtle: #edf7f3;
+  --surface-emphasis: #e3f2ec;
+  --primary: #34a78a;
+  --primary-hover: #278c73;
+  --primary-strong: #176653;
+  --primary-dark: #104b3d;
+  --primary-soft: #d8eee6;
+  --overlay-white: rgba(255, 255, 255, .94);
+  --status-safe-line: #c7e8d6;
+  --status-warning-line: #f0d9a7;
+  --status-critical-line: #f0c9c7;
+  --status-info-line: #cce0ee;
+  --navy: #104b3d;
+  --blue: #3678a8;
+  --pale-blue: #edf5fb;
+  --green: #23815f;
+  --pale-green: #e7f6ee;
   --amber: #bd7211;
-  --pale-amber: #fff6e4;
-  --red: #c2413d;
+  --pale-amber: #fff5df;
+  --red: #c34b4b;
   --pale-red: #fff0ef;
 }
 

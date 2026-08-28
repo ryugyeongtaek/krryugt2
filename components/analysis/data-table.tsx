@@ -4,8 +4,10 @@
 // 어떤 타입이든 받을 수 있어야 합니다. 그래서 컬럼 정의를 밖에서 받습니다.
 
 import type { ReactNode } from 'react';
+export { default } from '@/components/ui/data-table';
+export type { UiColumn as Column } from '@/components/ui/data-table';
 
-export type Column<T> = {
+export type LegacyColumn<T> = {
   key: string;
   label: string;
   align?: 'left' | 'right' | 'center';
@@ -18,13 +20,13 @@ export function formatNumber(value: number | null, suffix = '') {
   return (Number.isInteger(value) ? String(value) : value.toFixed(1)) + suffix;
 }
 
-export default function DataTable<T extends Record<string, unknown>>({
+export function LegacyDataTable<T extends Record<string, unknown>>({
   columns,
   rows,
   empty = '표시할 데이터가 없습니다.',
   rowKey,
 }: {
-  columns: Column<T>[];
+  columns: LegacyColumn<T>[];
   rows: T[];
   empty?: string;
   rowKey?: (row: T, index: number) => string;

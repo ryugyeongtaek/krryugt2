@@ -1,0 +1,24 @@
+.app-shell { min-height: 100vh; display: flex; background: var(--canvas); }
+.sidebar { background: var(--primary-dark); color: var(--white); }
+.main { min-width: 0; flex: 1; }
+.topbar { background: var(--overlay-white); border-bottom-color: var(--line); }
+.content { max-width: 1440px; }
+.shell-nav-group { display: grid; gap: 5px; }
+.shell-nav-heading { margin: 18px 10px 8px; color: rgba(255,255,255,.58); font-size: 10px; font-weight: 800; letter-spacing: 1.2px; }
+.shell-nav-link { text-decoration: none; }
+.nav-button.active, .shell-nav-link.active { background: var(--primary); color: var(--white); }
+.nav-button.active { box-shadow: 0 8px 20px rgba(16, 75, 61, .24); }
+.sidebar .brand-mark { background: var(--primary); }
+.sidebar .brand-copy span, .sidebar-foot { color: rgba(255,255,255,.62); }
+.sidebar-foot b { color: var(--white); }
+.topbar .eyebrow { color: var(--primary-strong); }
+.top-meta { color: var(--muted); }
+.local-badge { color: var(--primary-strong); background: var(--primary-soft); border-color: var(--line-strong); }
+@media (max-width: 860px) {
+  .sidebar { width: 82px; flex-basis: 82px; padding-inline: 10px; }
+  .brand-copy, .nav-label, .nav-button > span:last-child, .sidebar-foot { display: none; }
+  .brand { justify-content: center; margin-inline: 0; }
+  .nav-button { justify-content: center; padding-inline: 8px; }
+  .topbar { padding-inline: 20px; }
+  .content { padding-inline: 20px; }
+}

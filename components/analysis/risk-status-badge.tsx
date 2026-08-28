@@ -1,5 +1,6 @@
 import { AlertTriangle, CircleHelp, ShieldCheck } from 'lucide-react';
 import type { StockoutRiskStatus } from '@/lib/scm-model';
+import Badge from '@/components/ui/badge';
 
 const labels: Record<StockoutRiskStatus, string> = {
   SAFE: '안전',
@@ -9,7 +10,6 @@ const labels: Record<StockoutRiskStatus, string> = {
 
 export default function RiskStatusBadge({ status }: { status: StockoutRiskStatus }) {
   const Icon = status === 'SAFE' ? ShieldCheck : status === 'CRITICAL' ? AlertTriangle : CircleHelp;
-  const tone = status === 'SAFE' ? 'green' : status === 'CRITICAL' ? 'red' : 'gray';
-
-  return <span className={`tag ${tone}`}><Icon size={11} /> {labels[status]}</span>;
+  const normalized = status === 'SAFE' ? 'SAFE' : status === 'CRITICAL' ? 'CRITICAL' : 'CALCULATION_UNAVAILABLE';
+  return <Badge status={normalized}><Icon size={11} /> {labels[status]}</Badge>;
 }

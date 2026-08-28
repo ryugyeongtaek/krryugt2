@@ -1,0 +1,5 @@
+.chart-surface { min-height: 280px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.chart-grid-line { stroke: var(--line); stroke-width: 1; }
+.chart-series-primary { stroke: var(--primary); fill: none; }
+.chart-series-muted { stroke: var(--line-strong); fill: none; }
+.chart-legend { display: flex; justify-content: center; gap: 16px; color: var(--muted); font-size: 12px; }

@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { AlertTriangle, BarChart3, Boxes, Check, ChevronLeft, ChevronRight, CircleDollarSign, ClipboardCheck, FileSpreadsheet, FileText, Gauge, Layers3, PackageCheck, Settings2, ShoppingCart, Upload, Workflow, Wrench } from 'lucide-react';
 import DashboardStep from '@/components/workflow/dashboard-step';
 import DemandStep from '@/components/workflow/demand-step';
@@ -9,6 +8,7 @@ import SupplyStep from '@/components/workflow/supply-step';
 import MasterStep from '@/components/workflow/master-step';
 import CalculationStep from '@/components/workflow/calculation-step';
 import ReportStep from '@/components/workflow/report-step';
+import Sidebar from '@/components/shell/sidebar';
 
 export type StepId = 'dashboard' | 'demand' | 'supply' | 'master' | 'calculation' | 'report';
 
@@ -44,32 +44,7 @@ export default function ProcurementApp() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">OP</div>
-          <div className="brand-copy"><strong>월간 발주계획</strong><span>Procurement Planning</span></div>
-        </div>
-        <div className="nav-label">WORKFLOW</div>
-        <nav className="nav-list" aria-label="업무 단계">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const isDone = index < currentIndex;
-            return <button key={step.id} className={`nav-button ${active === step.id ? 'active' : ''} ${isDone ? 'complete' : ''}`} onClick={() => navigate(index)}>
-              <span className="nav-number">{isDone ? <Check size={12} strokeWidth={3} /> : <Icon size={13} />}</span>
-              <span>{step.label}</span>
-            </button>;
-          })}
-          <Link className="nav-button" href="/analysis/leadtime">
-            <span className="nav-number"><BarChart3 size={13} /></span>
-            <span>리드타임 분석</span>
-          </Link>
-          <Link className="nav-button" href="/analysis/stockout">
-            <span className="nav-number"><AlertTriangle size={13} /></span>
-            <span>소진 위험 분석</span>
-          </Link>
-        </nav>
-        <div className="sidebar-foot"><b>2026년 09월 발주계획</b><br />로컬 프로토타입 · Phase 1<br />상세 계산·저장은 다음 단계에서 연결됩니다.</div>
-      </aside>
+      <Sidebar />
       <main className="main">
         <header className="topbar">
           <div><div className="eyebrow">MONTHLY PROCUREMENT CONTROL</div><h1>{current.label}</h1></div>

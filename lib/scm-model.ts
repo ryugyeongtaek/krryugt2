@@ -55,6 +55,53 @@ export type DemandProfileKpi = {
   nCalculationUnavailable: number;
 };
 
+export type ForecastResult = {
+  runId: string;
+  modelId: string;
+  modelVersion: string;
+  itemId: string;
+  period: string;
+  predictedQty: number | null;
+  p50: number | null;
+  p80: number | null;
+  p90: number | null;
+  sigma: number | null;
+  basis: string;
+  reasonCode: string | null;
+};
+
+export type ForecastRun = {
+  runId: string;
+  status: 'RUNNING' | 'SUCCESS' | 'FAILED';
+  granularity: string | null;
+  trainStart: string | null;
+  trainEnd: string | null;
+  horizon: number | null;
+  dataSnapshotAt: string | null;
+  stale: boolean;
+  nModels: number;
+  nItems: number;
+  nRows: number;
+  startedAt: string | null;
+  finishedAt: string | null;
+  durationMs: number | null;
+  triggeredEmail: string | null;
+  message: string | null;
+};
+
+export type ModelConfig = {
+  modelId: string;
+  modelName: string;
+  family: string;
+  engine: string;
+  version: string;
+  enabled: boolean;
+  isDefault: boolean;
+  applicableDemandType: string[];
+  parameters: Record<string, unknown>;
+  description: string | null;
+};
+
 function value(row: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
@@ -120,6 +167,65 @@ export function normalizeDemandProfileKpi(row: Record<string, unknown>): DemandP
     nLumpy: numberValue(row, ['n_lumpy']) ?? 0,
     nCrostonNeeded: numberValue(row, ['n_croston_needed']) ?? 0,
     nCalculationUnavailable: numberValue(row, ['n_calculation_unavailable']) ?? 0,
+  };
+}
+
+export function normalizeForecastResult(row: Record<string, unknown>): ForecastResult {
+  return {
+    runId: stringValue(row, ['run_id']) ?? '미정',
+    modelId: stringValue(row, ['model_id']) ?? '미정',
+    modelVersion: stringValue(row, ['model_version']) ?? '미정',
+    itemId: stringValue(row, ['item_id']) ?? '미정',
+    period: stringValue(row, ['period']) ?? '미정',
+    predictedQty: numberValue(row, ['predicted_qty']),
+    p50: numberValue(row, ['p50']),
+    p80: numberValue(row, ['p80']),
+    p90: numberValue(row, ['p90']),
+    sigma: numberValue(row, ['sigma']),
+    basis: stringValue(row, ['basis']) ?? '미정',
+    reasonCode: stringValue(row, ['reason_code']),
+  };
+}
+
+function normalizeRunStatus(raw: unknown): ForecastRun['status'] {
+  const status = String(raw ?? '').toUpperCase();
+  return status === 'RUNNING' || status === 'SUCCESS' || status === 'FAILED' ? status : 'FAILED';
+}
+
+export function normalizeForecastRun(row: Record<string, unknown>): ForecastRun {
+  return {
+    runId: stringValue(row, ['run_id']) ?? '미정',
+    status: normalizeRunStatus(row.status),
+    granularity: stringValue(row, ['granularity']),
+    trainStart: stringValue(row, ['train_start']),
+    trainEnd: stringValue(row, ['train_end']),
+    horizon: numberValue(row, ['horizon']),
+    dataSnapshotAt: stringValue(row, ['data_snapshot_at']),
+    stale: row.is_stale === true || row.stale === true,
+    nModels: numberValue(row, ['n_models']) ?? 0,
+    nItems: numberValue(row, ['n_items']) ?? 0,
+    nRows: numberValue(row, ['n_rows']) ?? 0,
+    startedAt: stringValue(row, ['started_at']),
+    finishedAt: stringValue(row, ['finished_at']),
+    durationMs: numberValue(row, ['duration_ms']),
+    triggeredEmail: stringValue(row, ['triggered_email']),
+    message: stringValue(row, ['message']),
+  };
+}
+
+export function normalizeModelConfig(row: Record<string, unknown>): ModelConfig {
+  const types = value(row, ['applicable_demand_type']);
+  return {
+    modelId: stringValue(row, ['model_id']) ?? '미정',
+    modelName: stringValue(row, ['model_name']) ?? '미정',
+    family: stringValue(row, ['family']) ?? '미정',
+    engine: stringValue(row, ['engine']) ?? '미정',
+    version: stringValue(row, ['version']) ?? '미정',
+    enabled: row.enabled === true,
+    isDefault: row.is_default === true,
+    applicableDemandType: Array.isArray(types) ? types.map(String) : [],
+    parameters: (value(row, ['parameters']) as Record<string, unknown> | null) ?? {},
+    description: stringValue(row, ['description']),
   };
 }
 

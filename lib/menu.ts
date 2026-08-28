@@ -21,6 +21,8 @@ export const menuItems: MenuItem[] = [
   { id: 'admin-users', label: '사용자 관리', href: '/admin/users', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
   { id: 'admin-forecast-settings', label: 'Forecast 설정', href: '/admin/forecast-settings', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
   { id: 'admin-data-management', label: '데이터 관리', href: '/admin/data-management', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
+  { id: 'admin-forecast-models', label: 'Forecast 모델', href: '/admin/forecast-models', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
+  { id: 'admin-forecast-runs', label: 'Forecast 실행 이력', href: '/admin/forecast-runs', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
 ];
 
 export function getMenuItems(role: MenuRole): MenuItem[] {

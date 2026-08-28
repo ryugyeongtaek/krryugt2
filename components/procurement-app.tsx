@@ -22,7 +22,7 @@ const steps: { id: StepId; label: string; short: string; kicker: string; icon: t
   { id: 'report', label: '보고자료', short: '보고', kicker: 'EXECUTIVE REPORT', icon: FileText },
 ];
 
-export default function ProcurementApp() {
+export default function ProcurementApp({ role = 'USER' }: { role?: 'USER' | 'ADMIN' }) {
   const [active, setActive] = useState<StepId>('dashboard');
   const currentIndex = steps.findIndex((step) => step.id === active);
   const current = steps[currentIndex];
@@ -45,7 +45,7 @@ export default function ProcurementApp() {
 
   return (
     <div className="app-shell">
-      <Sidebar />
+      <Sidebar role={role} />
       <main className="main">
         <header className="topbar">
           <div><div className="eyebrow">MONTHLY PROCUREMENT CONTROL</div><h1>{current.label}</h1></div>

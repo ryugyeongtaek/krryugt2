@@ -5,3 +5,8 @@
 - 원인: Next.js 개발 서버(`npm run dev`)가 실행되지 않아 3000 포트가 열려 있지 않음.
 - 해결: 프로젝트 루트에서 `npm run dev` 실행 후 `http://localhost:3000` 접속.
 - 확인: Next.js 서버가 `0.0.0.0:3000`에서 LISTENING 상태이며 루트 요청이 `/workflow`로 redirect됨.
+
+## `/reset-password` 빌드 오류
+
+- 원인: 정적 생성 페이지에서 `useSearchParams()`를 Suspense 경계 없이 사용함.
+- 해결: URL 파라미터를 서버 페이지에서 읽고, 비밀번호 입력 폼만 클라이언트 컴포넌트로 분리함.

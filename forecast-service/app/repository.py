@@ -24,6 +24,10 @@ class Repository:
         frame["period"] = pd.to_datetime(frame["use_date"]).dt.to_period("M").dt.to_timestamp()
         return frame.groupby(["item_id", "period"], as_index=False)["qty"].sum()
 
+    def model_configs(self, model_ids: list[str]) -> list[dict]:
+        result = self.client.schema("core").table("model_config").select("model_id,version,parameters,enabled,engine,applicable_demand_type").in_("model_id", model_ids).eq("engine", "PYTHON").execute()
+        return result.data or []
+
     def start_run(self, user_email: str | None, settings: dict, model_ids: list[str]) -> str:
         run_id = str(uuid4())
         self.client.schema("core").table("forecast_run").insert({"run_id": run_id, "status": "RUNNING", "granularity": settings["granularity"], "train_start": settings["train_start"], "train_end": settings["train_end"], "horizon": settings["forecast_horizon"], "data_snapshot_at": datetime.now(timezone.utc).isoformat(), "models": model_ids, "n_models": len(model_ids), "triggered_email": user_email, "started_at": datetime.now(timezone.utc).isoformat()}).execute()

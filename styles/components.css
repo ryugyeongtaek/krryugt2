@@ -43,5 +43,7 @@
 .auth-form label { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 700; }
 .auth-form .button { width: 100%; margin-top: 6px; }
 .auth-error { margin: 16px 0 0; padding: 10px 12px; color: var(--red); background: var(--pale-red); border: 1px solid var(--status-critical-line); border-radius: 8px; font-size: 13px; }
+.auth-success { margin: 16px 0 0; padding: 10px 12px; color: var(--green); background: var(--pale-green); border: 1px solid var(--status-safe-line); border-radius: 8px; font-size: 13px; }
+.auth-link { display: block; margin-top: 18px; color: var(--primary-strong); font-size: 13px; text-align: center; text-decoration: underline; text-underline-offset: 3px; }
 .admin-user-form { display: flex; align-items: center; gap: 6px; }
 .admin-user-form select { min-height: 34px; padding: 4px 7px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px; }

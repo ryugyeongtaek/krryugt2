@@ -35,3 +35,13 @@
 .ui-insight-banner { display: flex; gap: 12px; align-items: flex-start; padding: 15px 17px; color: var(--primary-strong); background: var(--primary-soft); border: 1px solid var(--line-strong); border-radius: 10px; }
 .ui-empty-value { color: var(--muted); white-space: nowrap; }
 .ui-empty-value strong { color: var(--muted); font-weight: 600; }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--canvas); }
+.auth-card { width: min(100%, 420px); padding: 34px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-card); box-shadow: 0 16px 40px rgba(16, 75, 61, .08); }
+.auth-mark { margin-bottom: 24px; color: var(--white); background: var(--primary-dark); }
+.auth-card h1 { margin: 7px 0; color: var(--ink); }
+.auth-form { display: grid; gap: 16px; margin-top: 24px; }
+.auth-form label { display: grid; gap: 7px; color: var(--ink); font-size: 13px; font-weight: 700; }
+.auth-form .button { width: 100%; margin-top: 6px; }
+.auth-error { margin: 16px 0 0; padding: 10px 12px; color: var(--red); background: var(--pale-red); border: 1px solid var(--status-critical-line); border-radius: 8px; font-size: 13px; }
+.admin-user-form { display: flex; align-items: center; gap: 6px; }
+.admin-user-form select { min-height: 34px; padding: 4px 7px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 7px; }

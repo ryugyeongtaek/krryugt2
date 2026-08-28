@@ -1,4 +1,4 @@
--- 참가자가 값을 확정하는 두 테이블의 쓰기 정책입니다.
+-- 앱의 쓰기는 ADMIN 세션에서만 허용합니다.
 --
 -- core.leadtime_plan 과 core.usage_profile 은 dump.sql 에서 RLS 만 켜져 있고
 -- 정책이 하나도 없습니다(dump.sql:10936, 10948). 정책이 없는 RLS 는 "전부 거부"라
@@ -10,28 +10,34 @@
 
 -- 1) 테이블 권한 — RLS 와 별개로 필요합니다.
 --    01-grants.sql 은 select 만 줬으므로 쓰기 권한을 여기서 더합니다.
-grant select, insert, update, delete on core.leadtime_plan to anon, authenticated;
-grant select, insert, update, delete on core.usage_profile to anon, authenticated;
+revoke all on core.leadtime_plan from anon;
+revoke all on core.usage_profile from anon;
+grant select on core.leadtime_plan to authenticated;
+grant select on core.usage_profile to authenticated;
+grant insert, update, delete on core.leadtime_plan to authenticated;
+grant insert, update, delete on core.usage_profile to authenticated;
 
 -- 2) RLS 정책
 --    ⚠ 수업용입니다. publishable 키는 브라우저에 노출되므로,
 --      키를 가진 사람은 누구나 이 두 테이블을 고칠 수 있습니다.
 --      실제 운영에서는 auth.uid() 등으로 조건을 좁혀야 합니다.
 drop policy if exists "수업용 전체 허용" on core.leadtime_plan;
-create policy "수업용 전체 허용"
+drop policy if exists "관리자만 변경" on core.leadtime_plan;
+create policy "관리자만 변경"
   on core.leadtime_plan
   for all
-  to anon, authenticated
-  using (true)
-  with check (true);
+  to authenticated
+  using (core.is_admin())
+  with check (core.is_admin());
 
 drop policy if exists "수업용 전체 허용" on core.usage_profile;
-create policy "수업용 전체 허용"
+drop policy if exists "관리자만 변경" on core.usage_profile;
+create policy "관리자만 변경"
   on core.usage_profile
   for all
-  to anon, authenticated
-  using (true)
-  with check (true);
+  to authenticated
+  using (core.is_admin())
+  with check (core.is_admin());
 
 -- 확인 — 두 줄이 나와야 합니다.
 select schemaname, tablename, policyname, roles, cmd

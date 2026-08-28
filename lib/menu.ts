@@ -17,6 +17,7 @@ export const menuItems: MenuItem[] = [
   { id: 'leadtime', label: '리드타임 분석', href: '/analysis/leadtime', icon: BarChart3, roles: ['USER', 'ADMIN'], section: 'ANALYSIS' },
   { id: 'stockout', label: '소진 위험 분석', href: '/analysis/stockout', icon: AlertTriangle, roles: ['USER', 'ADMIN'], section: 'ANALYSIS' },
   { id: 'admin', label: '관리자 설정', href: '/admin', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
+  { id: 'admin-users', label: '사용자 관리', href: '/admin/users', icon: Settings2, roles: ['ADMIN'], section: 'ADMIN' },
 ];
 
 export function getMenuItems(role: MenuRole): MenuItem[] {

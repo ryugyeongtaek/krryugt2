@@ -1,5 +1,8 @@
 # dependencies
 node_modules/
+forecast-service/.venv/
+__pycache__/
+*.py[cod]
 
 # next.js build output
 .next/

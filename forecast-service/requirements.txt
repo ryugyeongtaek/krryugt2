@@ -1,0 +1,13 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+pandas>=2.2,<3
+numpy>=2.0,<3
+supabase>=2.9,<3
+pydantic>=2.8,<3
+statsmodels>=0.14,<1
+scikit-learn>=1.5,<2
+pytest>=8,<9
+
+# 선택 모델: 설치된 경우에만 해당 adapter를 활성화합니다.
+prophet>=1.1,<2
+xgboost>=2.1,<3

@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from './supabase';
-import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeLeadtimeGap, normalizeStockoutRisk, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type LeadtimeGap, type StockoutRisk } from './scm-model';
+import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeModelPerformance, normalizeChampionModel, normalizeComparisonPoint, normalizeLeadtimeGap, normalizeStockoutRisk, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type ModelPerformance, type ChampionModel, type ComparisonPoint, type LeadtimeGap, type StockoutRisk } from './scm-model';
 
 export async function getDemandProfiles(): Promise<{ rows: DemandProfile[]; error: string | null }> {
   try {
@@ -83,4 +83,24 @@ export async function getForecastResults(runId?: string): Promise<{ rows: Foreca
     if (error) return { rows: [], error: error.message };
     return { rows: (data ?? []).map((row) => normalizeForecastResult(row as Record<string, unknown>)), error: null };
   } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getBacktestPerformances(forecastRunId?: string): Promise<{ rows: ModelPerformance[]; error: string | null }> {
+  try { const supabase = await createSupabaseServerClient(); let q = supabase.schema('analytics').from('v_model_performance').select('*').order('item_id').order('rank'); if (forecastRunId) q = q.eq('forecast_run_id', forecastRunId); const { data, error } = await q; if (error) return { rows: [], error: error.message }; return { rows: (data ?? []).map((r) => normalizeModelPerformance(r as Record<string, unknown>)), error: null }; }
+  catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getChampions(backtestRunId?: string): Promise<{ rows: ChampionModel[]; error: string | null }> {
+  try { const supabase = await createSupabaseServerClient(); let q = supabase.schema('analytics').from('v_champion_model').select('*').order('item_id'); if (backtestRunId) q = q.eq('backtest_run_id', backtestRunId); const { data, error } = await q; if (error) return { rows: [], error: error.message }; return { rows: (data ?? []).map((r) => normalizeChampionModel(r as Record<string, unknown>)), error: null }; }
+  catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getComparisonPoints(runId?: string): Promise<{ rows: ComparisonPoint[]; error: string | null }> {
+  try { const supabase = await createSupabaseServerClient(); let q = supabase.schema('analytics').from('v_model_comparison').select('*').order('period').order('item_id'); if (runId) q = q.eq('run_id', runId); const { data, error } = await q; if (error) return { rows: [], error: error.message }; return { rows: (data ?? []).map((r) => normalizeComparisonPoint(r as Record<string, unknown>)), error: null }; }
+  catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getBacktestRuns() {
+  try { const supabase = await createSupabaseServerClient(); const { data, error } = await supabase.schema('analytics').from('v_backtest_run').select('*').order('started_at', { ascending: false }).limit(30); return { rows: data ?? [], error: error?.message ?? null }; }
+  catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }

@@ -1,0 +1,16 @@
+import Sidebar from '@/components/shell/sidebar';
+import Topbar from '@/components/shell/topbar';
+import PageHeader from '@/components/shell/page-header';
+import Panel from '@/components/ui/panel';
+import Badge from '@/components/ui/badge';
+import EmptyValue from '@/components/ui/empty-value';
+import { getBacktestRuns, getForecastRuns, getBacktestPerformances } from '@/lib/scm';
+import { runBacktestAction, setManualChampionAction } from '@/lib/backtest';
+import { requireAdmin } from '@/lib/auth';
+
+export default async function BacktestPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  await requireAdmin('/admin/backtest');
+  const params = await searchParams;
+  const [{ rows: forecastRuns }, { rows: backtestRuns, error }, { rows: performance }] = await Promise.all([getForecastRuns(), getBacktestRuns(), getBacktestPerformances()]);
+  return <div className="app-shell"><Sidebar role="ADMIN" /><main className="main"><Topbar title="Backtest" subtitle="VALIDATION SCORING" /><div className="content"><PageHeader eyebrow="ADMIN / BACKTEST" title="Backtest · Champion 관리" description="저장된 Forecast Result와 검증기간 Actual을 비교합니다. Forecast를 다시 계산하지 않습니다." />{params.error && <p className="text-danger">처리 실패: {params.error}</p>}<Panel title="Backtest 실행"><form action={runBacktestAction} className="import-form"><select name="forecast_run_id" required defaultValue=""><option value="" disabled>Forecast Run 선택</option>{forecastRuns.map((run) => <option key={run.runId} value={run.runId}>{run.runId.slice(0, 8)} · {run.status}</option>)}</select><button className="button primary" type="submit">Backtest 실행</button></form></Panel><Panel title="Backtest 실행 이력"><div className="analysis-table-wrap"><table className="analysis-table"><thead><tr><th>ID</th><th>Forecast Run</th><th>기간</th><th>Metric</th><th>상태</th><th>실행자</th></tr></thead><tbody>{backtestRuns.map((run) => <tr key={run.backtest_run_id}><td>{run.backtest_run_id}</td><td>{run.forecast_run_id}</td><td>{run.test_start} ~ {run.test_end}</td><td>{run.metric}</td><td><Badge status={run.status === 'SUCCESS' ? 'SAFE' : run.status === 'FAILED' ? 'CRITICAL' : 'WARNING'}>{run.status}</Badge></td><td>{run.triggered_by ?? <EmptyValue reasonCode="NO_TRIGGER_USER" />}</td></tr>)}{backtestRuns.length === 0 && <tr><td colSpan={6}><EmptyValue reasonCode="NO_BACKTEST_RUN" /></td></tr>}</tbody></table></div></Panel><Panel title="Manual Champion 지정" description="ADMIN 전용. reason은 필수이며 변경 이력이 audit_log와 history에 남습니다."><form action={setManualChampionAction} className="import-form"><select name="backtest_run_id" required defaultValue=""><option value="" disabled>Backtest Run</option>{backtestRuns.map((run) => <option key={run.backtest_run_id} value={run.backtest_run_id}>{run.backtest_run_id.slice(0, 8)}</option>)}</select><input name="item_id" placeholder="SKU" required /><input name="model_id" placeholder="Model ID" required /><input name="reason" placeholder="변경 사유" required /><button className="button primary" type="submit">Champion 지정</button></form><p className="muted">유효한 performance가 없는 모델은 지정할 수 없습니다.</p></Panel><p className="muted">현재 성능 결과 {performance.length.toLocaleString()}건 · 비교 화면: <a href="/analysis/model-comparison">Model Comparison</a></p></div></main></div>;
+}

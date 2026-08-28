@@ -102,6 +102,22 @@ export type ModelConfig = {
   description: string | null;
 };
 
+export type ModelPerformance = { backtestRunId: string; forecastRunId: string; modelId: string; modelVersion: string | null; itemId: string; nPeriods: number; wape: number | null; mape: number | null; bias: number | null; rmse: number | null; mae: number | null; baselineImprovement: number | null; rank: number | null; calculationStatus: string; reasonCode: string | null };
+export type ChampionModel = { backtestRunId: string; itemId: string; championModelId: string; modelVersion: string | null; championMetric: string; championMetricValue: number | null; selectionReason: string; selectionMethod: 'AUTO' | 'MANUAL' };
+export type ComparisonPoint = { runId: string; modelId: string; modelVersion: string | null; itemId: string; period: string; p50: number | null; p80: number | null; p90: number | null; sigma: number | null; actualQty: number | null; basis: string };
+
+export function normalizeModelPerformance(row: Record<string, unknown>): ModelPerformance {
+  return { backtestRunId: String(row.backtest_run_id ?? ''), forecastRunId: String(row.forecast_run_id ?? ''), modelId: String(row.model_id ?? ''), modelVersion: stringValue(row, ['model_version']), itemId: String(row.item_id ?? ''), nPeriods: Number(row.n_periods ?? 0), wape: numberOrNull(row.wape), mape: numberOrNull(row.mape), bias: numberOrNull(row.bias), rmse: numberOrNull(row.rmse), mae: numberOrNull(row.mae), baselineImprovement: numberOrNull(row.baseline_improvement), rank: numberOrNull(row.rank), calculationStatus: String(row.calculation_status ?? 'CALCULATION_UNAVAILABLE'), reasonCode: stringValue(row, ['reason_code']) };
+}
+
+export function normalizeChampionModel(row: Record<string, unknown>): ChampionModel {
+  return { backtestRunId: String(row.backtest_run_id ?? ''), itemId: String(row.item_id ?? ''), championModelId: String(row.champion_model_id ?? ''), modelVersion: stringValue(row, ['model_version']), championMetric: String(row.champion_metric ?? ''), championMetricValue: numberOrNull(row.champion_metric_value), selectionReason: String(row.selection_reason ?? ''), selectionMethod: row.selection_method === 'MANUAL' ? 'MANUAL' : 'AUTO' };
+}
+
+export function normalizeComparisonPoint(row: Record<string, unknown>): ComparisonPoint {
+  return { runId: String(row.run_id ?? ''), modelId: String(row.model_id ?? ''), modelVersion: stringValue(row, ['model_version']), itemId: String(row.item_id ?? ''), period: String(row.period ?? ''), p50: numberOrNull(row.p50), p80: numberOrNull(row.p80), p90: numberOrNull(row.p90), sigma: numberOrNull(row.sigma), actualQty: numberOrNull(row.actual_qty), basis: String(row.basis ?? '') };
+}
+
 function value(row: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
     if (row[key] !== undefined && row[key] !== null && row[key] !== '') return row[key];
@@ -131,6 +147,12 @@ export function normalizeLeadtimeGap(row: Record<string, unknown>): LeadtimeGap 
 function stringValue(row: Record<string, unknown>, keys: string[]) {
   const raw = value(row, keys);
   return raw === null ? null : String(raw);
+}
+
+function numberOrNull(raw: unknown): number | null {
+  if (raw === null || raw === undefined || raw === '') return null;
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
 }
 
 function normalizeDemandType(raw: unknown): DemandType | null {

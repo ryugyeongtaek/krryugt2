@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from './supabase';
-import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeModelPerformance, normalizeChampionModel, normalizeComparisonPoint, normalizeLeadtimeGap, normalizeStockoutRisk, normalizeInventoryProjection, normalizeLeadtimePolicy, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type ModelPerformance, type ChampionModel, type ComparisonPoint, type LeadtimeGap, type StockoutRisk, type InventoryProjection, type LeadtimePolicy } from './scm-model';
+import { normalizeDemandProfile, normalizeDemandProfileKpi, normalizeForecastResult, normalizeForecastRun, normalizeModelConfig, normalizeModelPerformance, normalizeChampionModel, normalizeComparisonPoint, normalizeLeadtimeGap, normalizeStockoutRisk, normalizeInventoryProjection, normalizeLeadtimePolicy, normalizePurchaseRecommendation, type DemandProfile, type DemandProfileKpi, type ForecastResult, type ForecastRun, type ModelConfig, type ModelPerformance, type ChampionModel, type ComparisonPoint, type LeadtimeGap, type StockoutRisk, type InventoryProjection, type LeadtimePolicy, type PurchaseRecommendation } from './scm-model';
 
 export async function getDemandProfiles(): Promise<{ rows: DemandProfile[]; error: string | null }> {
   try {
@@ -71,6 +71,17 @@ export async function getLeadtimePolicies(): Promise<{ rows: LeadtimePolicy[]; e
     const { data, error } = await supabase.schema('analytics').from('v_leadtime_policy').select('*').order('supplier_id').order('item_id');
     if (error) return { rows: [], error: error.message };
     return { rows: (data ?? []).map((row) => normalizeLeadtimePolicy(row as Record<string, unknown>)), error: null };
+  } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getPurchaseRecommendations(itemId?: string): Promise<{ rows: PurchaseRecommendation[]; error: string | null }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.schema('analytics').from('v_purchase_recommendation').select('*').order('is_immediate', { ascending: false }).order('item_id');
+    if (itemId) query = query.eq('item_id', itemId);
+    const { data, error } = await query;
+    if (error) return { rows: [], error: error.message };
+    return { rows: (data ?? []).map((row) => normalizePurchaseRecommendation(row as Record<string, unknown>)), error: null };
   } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }
 

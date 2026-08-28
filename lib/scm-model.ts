@@ -69,6 +69,15 @@ export type LeadtimePolicy = {
   reason: string | null;
 };
 
+export type PurchaseRecommendation = {
+  itemId: string; itemName: string | null; itemGrade: string | null; forecastQty: number | null; confirmedOrderQty: number | null;
+  demandBasisQty: number | null; availableInventory: number | null; scheduledReceipt: number | null; safetyStock: number | null;
+  effectiveLeadtime: number | null; stockoutDate: string | null; safetyBufferDays: number | null; requiredQty: number | null;
+  moq: number | null; packSize: number | null; recommendedQty: number | null; recommendedOrderDate: string | null;
+  riskStatus: StockoutRiskStatus; calculationStatus: string; reasonCode: string | null; forecastRunId: string | null;
+  modelVersion: string | null; isImmediate: boolean; isOverdue: boolean; calculationTrace: Record<string, unknown>;
+};
+
 export type DemandType = 'SMOOTH' | 'INTERMITTENT' | 'ERRATIC' | 'LUMPY';
 export type DemandProfile = {
   itemId: string;
@@ -349,4 +358,15 @@ export function normalizeLeadtimePolicy(row: Record<string, unknown>): LeadtimeP
     p80: numberValue(row, ['p80_days','p80']), p90: numberValue(row, ['p90_days','p90']), sampleCount: numberValue(row, ['n_samples']) ?? 0,
     confirmedLeadTime: numberValue(row, ['confirmed_lead_time']), effectiveLeadTime: numberValue(row, ['effective_lead_time']),
     effectiveFrom: stringValue(row, ['effective_from']), changedBy: stringValue(row, ['changed_by']), reason: stringValue(row, ['reason']) };
+}
+
+export function normalizePurchaseRecommendation(row: Record<string, unknown>): PurchaseRecommendation {
+  return { itemId: stringValue(row, ['item_id']) ?? '미정', itemName: stringValue(row, ['item_name']), itemGrade: stringValue(row, ['item_grade']),
+    forecastQty: numberValue(row, ['forecast_qty']), confirmedOrderQty: numberValue(row, ['confirmed_order_qty','confirmed_sales_order']), demandBasisQty: numberValue(row, ['demand_basis_qty']),
+    availableInventory: numberValue(row, ['available_inventory']), scheduledReceipt: numberValue(row, ['scheduled_receipt']), safetyStock: numberValue(row, ['safety_stock']),
+    effectiveLeadtime: numberValue(row, ['effective_lead_time']), stockoutDate: stringValue(row, ['stockout_date']), safetyBufferDays: numberValue(row, ['safety_buffer_days']),
+    requiredQty: numberValue(row, ['required_qty']), moq: numberValue(row, ['moq']), packSize: numberValue(row, ['pack_size']), recommendedQty: numberValue(row, ['recommended_qty']),
+    recommendedOrderDate: stringValue(row, ['recommended_order_date']), riskStatus: normalizeRiskStatus(row.risk_status), calculationStatus: String(row.calculation_status ?? 'CALCULATION_UNAVAILABLE'),
+    reasonCode: stringValue(row, ['reason_code']), forecastRunId: stringValue(row, ['forecast_run_id']), modelVersion: stringValue(row, ['model_version']),
+    isImmediate: row.is_immediate === true, isOverdue: row.is_overdue === true, calculationTrace: (row.calculation_trace as Record<string, unknown> | null) ?? {} };
 }

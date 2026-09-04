@@ -26,3 +26,9 @@
 
 - 원인: 페이지 JSX 하단에 함수 종료 중괄호가 중복으로 들어감.
 - 해결: 중복 중괄호를 제거하고 build를 다시 실행함.
+
+## SQL 적재 후 Git push 실패 (2026-09-04)
+
+- 원인: 현재 작업 환경에서 `.git/index` 갱신 권한이 없어 안전 migration 파일을 stage/commit하지 못했고, GitHub 원격 연결도 `github.com:443`에 연결할 수 없어 실패함.
+- 상태: 기존 `fe16793` 커밋은 `origin/main`과 동일하지만, `supabase/migrations/20260904000100_import_01_schema_safe.sql`은 아직 untracked 상태.
+- 해결: Git 권한과 네트워크가 가능한 환경에서 `git add`, `git commit`, `git push origin main`을 재시도해야 함.

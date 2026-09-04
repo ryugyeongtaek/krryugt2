@@ -160,6 +160,8 @@ export type ComparisonPoint = { runId: string; modelId: string; modelVersion: st
 
 export type ShipmentTrend = {
   itemCode: string;
+  period: string | null;
+  periodQty: number | null;
   description: string | null;
   family: string | null;
   itemType: string | null;
@@ -453,7 +455,7 @@ export function normalizePurchaseRecommendation(row: Record<string, unknown>): P
 
 export function normalizeShipmentTrend(row: Record<string, unknown>): ShipmentTrend {
   return {
-    itemCode: stringValue(row, ['item_code', 'item_id']) ?? '미정', description: stringValue(row, ['description', 'item_name', '품목명']),
+    itemCode: stringValue(row, ['item_code', 'item_id']) ?? '미정', period: stringValue(row, ['ym', 'period', 'shipment_ym', 'month']), periodQty: numberValue(row, ['qty', 'period_qty', 'monthly_qty', 'shipment_qty']), description: stringValue(row, ['description', 'item_name', '품목명']),
     family: stringValue(row, ['family']), itemType: stringValue(row, ['item_type']), dataAsOf: stringValue(row, ['data_as_of']),
     nMonths: numberValue(row, ['n_months']), firstYm: stringValue(row, ['first_ym']), lastYm: stringValue(row, ['last_ym']),
     monthsSinceLast: numberValue(row, ['months_since_last']), nSpan: numberValue(row, ['n_span']), totalQty: numberValue(row, ['total_qty']),

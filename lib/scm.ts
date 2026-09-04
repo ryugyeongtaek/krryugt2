@@ -137,11 +137,22 @@ export async function getBacktestRuns() {
 export async function getShipmentTrend(itemCode?: string): Promise<{ rows: ShipmentTrend[]; error: string | null }> {
   try {
     const supabase = await createSupabaseServerClient();
-    let query = supabase.schema('analytics').from('v_shipment_trend').select('*').order('item_code');
+    let query = supabase.schema('analytics').from('v_shipment_by_hoc').select('*').order('item_code').order('ym');
     if (itemCode) query = query.eq('item_code', itemCode);
     const { data, error } = await query;
     if (error) return { rows: [], error: error.message };
     return { rows: (data ?? []).map((row) => normalizeShipmentTrend(row as Record<string, unknown>)), error: null };
+  } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
+}
+
+export async function getDemandProfile(itemCode?: string): Promise<{ rows: DemandProfileRt[]; error: string | null }> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.schema('analytics').from('v_item_demand_profile').select('*').order('item_code');
+    if (itemCode) query = query.eq('item_code', itemCode);
+    const { data, error } = await query;
+    if (error) return { rows: [], error: error.message };
+    return { rows: (data ?? []).map((row) => normalizeDemandProfileRt(row as Record<string, unknown>)), error: null };
   } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }
 
@@ -156,18 +167,21 @@ export async function getDemandProfileRt(itemCode?: string): Promise<{ rows: Dem
   } catch (error) { return { rows: [], error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }
 
-export async function getOlAccuracy(modelBase?: string): Promise<{ data: OlAccuracyResult | null; error: string | null }> {
+export async function getOlAccuracy(modelBase?: string, fy?: string): Promise<{ data: OlAccuracyResult | null; error: string | null }> {
   try {
     const supabase = await createSupabaseServerClient();
     let accuracyQuery = supabase.schema('analytics').from('v_ol_accuracy').select('*').order('model_base');
     if (modelBase) accuracyQuery = accuracyQuery.eq('model_base', modelBase);
-    const [accuracy, fy] = await Promise.all([
+    if (fy) accuracyQuery = accuracyQuery.eq('fy_sheet', fy);
+    let fyQuery = supabase.schema('analytics').from('v_ol_accuracy_fy').select('*').order('fy_sheet');
+    if (fy) fyQuery = fyQuery.eq('fy_sheet', fy);
+    const [accuracy, fyResult] = await Promise.all([
       accuracyQuery,
-      supabase.schema('analytics').from('v_ol_accuracy_fy').select('*').order('fy_sheet'),
+      fyQuery,
     ]);
     if (accuracy.error) return { data: null, error: accuracy.error.message };
-    if (fy.error) return { data: null, error: fy.error.message };
-    return { data: { rows: (accuracy.data ?? []).map((row) => normalizeOlAccuracy(row as Record<string, unknown>)), fyRows: (fy.data ?? []).map((row) => normalizeOlAccuracyFy(row as Record<string, unknown>)) }, error: null };
+    if (fyResult.error) return { data: null, error: fyResult.error.message };
+    return { data: { rows: (accuracy.data ?? []).map((row) => normalizeOlAccuracy(row as Record<string, unknown>)), fyRows: (fyResult.data ?? []).map((row) => normalizeOlAccuracyFy(row as Record<string, unknown>)) }, error: null };
   } catch (error) { return { data: null, error: error instanceof Error ? error.message : 'Supabase 조회에 실패했습니다.' }; }
 }
 

@@ -16,7 +16,7 @@ test('Forecast Engine은 모델 레지스트리·버전·결과·실행 이력�
 test('Baseline 계산은 학습 데이터와 DB parameters를 사용한다', () => {
   assert.match(migration, /core\.v_train_demand/i);
   assert.match(migration, /parameters/i);
-  assert.match(migration, /3.*2.*1/s);
+  assert.match(migration, /3[\s\S]*2[\s\S]*1/);
   assert.doesNotMatch(migration, /from\s+raw\.usage_history/i);
   assert.doesNotMatch(migration, /core\.v_test_actual/i);
 });

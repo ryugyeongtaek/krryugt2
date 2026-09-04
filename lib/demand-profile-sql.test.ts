@@ -17,7 +17,7 @@ test('Demand Type은 SBC 기준과 24개월 Seasonality 경계를 사용한다',
   assert.match(migration, /1\.32/);
   assert.match(migration, /0\.49/);
   assert.match(migration, /insufficient_periods/i);
-  assert.match(migration, /intermittent.*lumpy|lumpy.*intermittent/is);
+  assert.match(migration, /intermittent[\s\S]*lumpy|lumpy[\s\S]*intermittent/i);
 });
 
 test('Demand Profile은 raw usage와 test actual을 사용하지 않는다', () => {

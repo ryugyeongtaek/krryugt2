@@ -1,6 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeLeadtimeGap, normalizeStockoutRisk } from './scm-model.ts';
+import { normalizeLeadtimeGap, normalizeStockoutRisk, normalizeShipmentTrend } from './scm-model.ts';
+
+test('normalizes shipment trend rows and preserves the requested sample values', () => {
+  const result = normalizeShipmentTrend({
+    item_code: '602K02693',
+    item_name: '테스트 품목',
+    n_span: 40,
+    latest_qty: 779,
+    avg_3m: 772.3,
+  });
+
+  assert.equal(result.itemCode, '602K02693');
+  assert.equal(result.nSpan, 40);
+  assert.equal(result.latestQty, 779);
+  assert.equal(result.avg3m, 772.3);
+});
 
 test('normalizes analytics leadtime rows into the screen model', () => {
   const result = normalizeLeadtimeGap({

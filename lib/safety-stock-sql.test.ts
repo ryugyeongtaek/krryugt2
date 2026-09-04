@@ -14,7 +14,7 @@ test('Safety Stock uses forecast error, lead time variability, service policy an
 
 test('Purchase Recommendation applies demand basis, MOQ and pack size in SQL', () => {
   assert.match(sql, /v_purchase_recommendation/i);
-  assert.match(sql, /greatest\(.*forecast_qty.*confirmed_sales_order/is);
+  assert.match(sql, /greatest\([\s\S]*forecast_qty[\s\S]*confirmed_sales_order/i);
   assert.match(sql, /moq/i);
   assert.match(sql, /pack_size/i);
   assert.match(sql, /ceil/i);

@@ -150,6 +150,21 @@ test('이후 라운드는 json_object 형식을 유지해 fallback 400 재시도
   assert.deepEqual(formats[1], { type: 'json_object' });
 });
 
+test('최종 AgentAnswer 형식 오류는 한 번만 재생성하고 정상 답변을 유지한다', async () => {
+  let calls = 0;
+  const result = await runAgent({ question: '출고 추이', user: { role: 'USER' } }, {
+    tools: [],
+    llm: async () => {
+      calls += 1;
+      if (calls === 1) return { content: '설명 문장만 반환됨', message: { role: 'assistant', content: '설명 문장만 반환됨' }, toolCalls: [] };
+      return finalResult('재생성된 답변');
+    },
+  });
+
+  assert.equal(calls, 2);
+  assert.equal(result.answer.answer, '재생성된 답변');
+});
+
 test('LLM과 Tool 실패는 예외 대신 cannotAnswer로 변환한다', async () => {
   const llmFailure = await runAgent({ question: '질문', user: { role: 'USER' } }, {
     tools: [tool()],

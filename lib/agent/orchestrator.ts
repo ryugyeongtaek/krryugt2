@@ -165,7 +165,16 @@ export async function runAgent(
     const calls = getToolCalls(llmResult.value);
     if (calls.length === 0) {
       const answer = finalAnswer(llmResult.value);
-      if (!answer) return unavailable('INVALID_LLM_ANSWER', history, trace);
+      if (!answer) {
+        if (regenerated) return unavailable('INVALID_LLM_ANSWER', history, trace);
+        regenerated = true;
+        history.push({
+          role: 'system',
+          content: '최종 답변 형식이 올바르지 않습니다. 설명 문장이나 Markdown을 붙이지 말고, response_format의 AgentAnswer JSON 객체 필드를 모두 포함해 한 번만 다시 답변하세요.',
+        });
+        useFallbackResponseFormat = true;
+        continue;
+      }
       const validation = validateAnswerNumbers(answer, toolSources);
       if (validation.ok) return { answer, trace, history };
       if (regenerated) return unavailable('UNSUPPORTED_NUMBERS', history, trace);

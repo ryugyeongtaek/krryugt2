@@ -85,6 +85,28 @@ test('json_schema 400이면 같은 모델에서 json_object로 한 번만 재시
   assert.equal(bodies[1].temperature, 0);
 });
 
+test('json_object fallback 재시도에는 JSON 응답 지시가 포함된다', async () => {
+  setEnv('https://fallback-json.example.test', 'key', 'json-object-model');
+  const bodies: Record<string, unknown>[] = [];
+  let calls = 0;
+  const fetchImpl = async (_input: RequestInfo | URL, init?: RequestInit) => {
+    calls += 1;
+    bodies.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+    if (calls === 1) return new Response('json_schema is not supported', { status: 400 });
+    return new Response(JSON.stringify({ choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }] }), { status: 200 });
+  };
+
+  const result = await callLlm({
+    messages: [{ role: 'user', content: '질문' }],
+    response_format: { type: 'json_schema', json_schema: { name: 'answer', strict: true, schema: {} } },
+  }, fetchImpl);
+
+  assert.equal(result.error, undefined);
+  assert.equal(calls, 2);
+  const messages = bodies[1].messages as { content: string }[];
+  assert.ok(messages.some((message) => message.content.toLowerCase().includes('json')));
+});
+
 test('temperature가 원인인 400이면 temperature 없이 한 번만 재시도한다', async () => {
   setEnv('https://fallback-temperature.example.test', 'key', 'temperature-fallback-model');
   const bodies: Record<string, unknown>[] = [];

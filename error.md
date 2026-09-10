@@ -141,3 +141,17 @@ Agent 질문 결과가 `CALCULATION_UNAVAILABLE`로 표시되고, `analytics.v_s
 ### 해결
 
 `getShipmentTrend`가 `analytics.v_shipment_trend`를 조회하도록 수정하고 Agent Tool 설명도 실제 화면용 뷰와 일치시켰습니다. 화면용 analytics 뷰는 원천 `core.v_shipment_by_hoc`를 내부에서 사용하므로 XCN 합산 규칙도 유지됩니다.
+
+## Agent JSON 응답 fallback 실패 (2026-09-10)
+
+### 증상
+
+Agent 질문이 `LLM HTTP 400`으로 실패하며, `json_object` 응답 형식 사용 시 `messages`에 `json`이라는 단어가 필요하다는 오류가 표시됐습니다.
+
+### 원인
+
+모델이 `json_schema`를 지원하지 않아 `json_object`로 한 번 재시도했지만, 재시도 요청의 messages에 JSON 응답 지시가 없었습니다.
+
+### 해결
+
+`json_schema` fallback 시 JSON 지시 system message를 한 번 추가하도록 수정했습니다. 기존 messages에 이미 JSON 지시가 있으면 중복 추가하지 않습니다.

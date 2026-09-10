@@ -168,6 +168,16 @@ function isJsonSchema(body: Record<string, unknown>): boolean {
   return responseFormat !== null && typeof responseFormat === 'object' && (responseFormat as Record<string, unknown>).type === 'json_schema';
 }
 
+function withJsonInstruction(body: Record<string, unknown>): Record<string, unknown> {
+  const messages = Array.isArray(body.messages) ? body.messages as ChatMessage[] : [];
+  const hasJsonInstruction = messages.some((message) => typeof message.content === 'string' && message.content.toLowerCase().includes('json'));
+  if (hasJsonInstruction) return body;
+  return {
+    ...body,
+    messages: [{ role: 'system', content: '응답은 유효한 JSON 형식으로 작성하세요.' }, ...messages],
+  };
+}
+
 export async function callLlm(
   request: ChatRequest,
   fetchImpl: FetchLike = fetch,
@@ -217,7 +227,7 @@ export async function callLlm(
       }
       if (isJsonSchema(body)) {
         fallbackMemory.add(memoryKey);
-        body = { ...body, response_format: { type: 'json_object' } };
+        body = withJsonInstruction({ ...body, response_format: { type: 'json_object' } });
         continue;
       }
     }

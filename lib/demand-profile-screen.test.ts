@@ -4,11 +4,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 const page = readFileSync(join(process.cwd(), 'app/analysis/demand-profile/page.tsx'), 'utf8');
-const table = readFileSync(join(process.cwd(), 'components/analysis/demand-profile-table.tsx'), 'utf8');
+const table = readFileSync(join(process.cwd(), 'components/analysis/demand-profile-rt-table.tsx'), 'utf8');
 
 test('Demand Profile route는 저장된 analytics 결과와 공통 화면을 사용한다', () => {
-  assert.match(page, /getDemandProfiles/);
-  assert.match(page, /getDemandProfileKpi/);
+  assert.match(page, /getDemandProfileRt/);
+  assert.match(page, /v_item_demand_profile/);
   assert.match(page, /AnalysisFrame/);
   assert.match(table, /demandType|demand_type/);
 });

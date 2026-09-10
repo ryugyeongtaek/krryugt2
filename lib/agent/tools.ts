@@ -10,6 +10,8 @@ export type ToolResult = {
   reason: string | null;
 };
 
+const MAX_AGENT_ROWS = 100;
+
 type JsonSchema = {
   type: 'object';
   additionalProperties: false;
@@ -67,6 +69,10 @@ function collectNumbers(value: unknown, path = '', result: Record<string, number
 
 export { collectNumbers };
 
+export function compactToolData<T>(data: T): T {
+  return Array.isArray(data) ? data.slice(0, MAX_AGENT_ROWS) as T : data;
+}
+
 function findDataAsOf(value: unknown): string | null {
   if (Array.isArray(value)) {
     for (const entry of value) {
@@ -95,12 +101,13 @@ function hasReturnedData(value: unknown): boolean {
 }
 
 function resultFrom<T extends ToolResult['data']>(data: T, error: string | null): ToolResult {
-  const reason = error ?? (hasReturnedData(data) ? null : 'NO_DATA');
+  const compactedData = compactToolData(data);
+  const reason = error ?? (hasReturnedData(compactedData) ? null : 'NO_DATA');
   return {
     ok: error === null && reason === null,
-    data,
-    numbers: collectNumbers(data),
-    dataAsOf: findDataAsOf(data),
+    data: compactedData,
+    numbers: collectNumbers(compactedData),
+    dataAsOf: findDataAsOf(compactedData),
     reason,
   };
 }

@@ -3,7 +3,7 @@ import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { agentTools, collectNumbers } from './tools.ts';
+import { agentTools, collectNumbers, compactToolData } from './tools.ts';
 
 test('Agent Tool 이름은 유일하고 필수 메타데이터를 가진다', () => {
   const names = agentTools.map((tool) => tool.name);
@@ -40,6 +40,15 @@ test('조회 데이터의 모든 수치를 경로별로 수집하고 null은 보
     collectNumbers({ rows: [{ qty: 779, avg: null }, { qty: 772.3 }], count: 40 }),
     { 'rows[0].qty': 779, 'rows[1].qty': 772.3, count: 40 },
   );
+});
+
+test('대용량 Agent 조회 결과는 모델 컨텍스트에 맞게 제한한다', () => {
+  const rows = Array.from({ length: 250 }, (_, index) => ({ item_code: `ITEM${index}`, qty: index }));
+
+  const compacted = compactToolData(rows);
+
+  assert.equal(compacted.length, 100);
+  assert.equal(compacted[99].item_code, 'ITEM99');
 });
 
 test('Agent Tool은 Supabase를 직접 조회하지 않고 scm을 동적으로 import한다', () => {

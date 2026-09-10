@@ -105,6 +105,7 @@ test('json_object fallback 재시도에는 JSON 응답 지시가 포함된다', 
   assert.equal(calls, 2);
   const messages = bodies[1].messages as { content: string }[];
   assert.ok(messages.some((message) => message.content.toLowerCase().includes('json')));
+  assert.ok(messages.some((message) => message.content.includes('cannot_answer_reason')));
 });
 
 test('json_object로 시작한 요청도 JSON 응답 지시를 포함한다', async () => {
@@ -123,6 +124,7 @@ test('json_object로 시작한 요청도 JSON 응답 지시를 포함한다', as
   assert.equal(result.error, undefined);
   const messages = body?.messages as { content: string }[];
   assert.ok(messages.some((message) => message.content.toLowerCase().includes('json')));
+  assert.ok(messages.some((message) => message.content.includes('cannot_answer_reason')));
 });
 
 test('temperature가 원인인 400이면 temperature 없이 한 번만 재시도한다', async () => {

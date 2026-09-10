@@ -179,7 +179,10 @@ function withJsonInstruction(body: Record<string, unknown>): Record<string, unkn
   if (hasJsonInstruction) return body;
   return {
     ...body,
-    messages: [{ role: 'system', content: '응답은 유효한 JSON 형식으로 작성하세요.' }, ...messages],
+    messages: [{
+      role: 'system',
+      content: '응답은 유효한 JSON 형식으로 작성하세요. Markdown 코드블록이나 설명 문장을 붙이지 말고, answer, verdict, evidence, data_as_of, risk, recommended_action, cannot_answer, cannot_answer_reason 필드를 모두 포함한 JSON 객체만 반환하세요.',
+    }, ...messages],
   };
 }
 

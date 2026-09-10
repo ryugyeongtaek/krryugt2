@@ -37,6 +37,13 @@ test('계산 불가 응답도 명시적인 사유와 함께 파싱한다', () =>
   assert.deepEqual(parseAgentAnswer(JSON.stringify(answer)), answer);
 });
 
+test('호환 모델이 반환한 JSON 코드블록도 AgentAnswer로 파싱한다', () => {
+  const answer = cannotAnswer('NO_FORECAST');
+  const fenced = `\`\`\`json\n${JSON.stringify(answer)}\n\`\`\``;
+
+  assert.deepEqual(parseAgentAnswer(fenced), answer);
+});
+
 test('Structured Outputs 스키마는 strict object 계약을 유지한다', () => {
   assert.equal(agentAnswerJsonSchema.type, 'object');
   assert.equal(agentAnswerJsonSchema.additionalProperties, false);

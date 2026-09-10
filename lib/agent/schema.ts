@@ -144,7 +144,9 @@ function isAgentAnswer(value: unknown): value is AgentAnswer {
 
 export function parseAgentAnswer(input: string): AgentAnswer | null {
   try {
-    const parsed: unknown = JSON.parse(input);
+    const trimmed = input.trim();
+    const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+    const parsed: unknown = JSON.parse(fenced ? fenced[1] : trimmed);
     return isAgentAnswer(parsed) ? parsed : null;
   } catch {
     return null;

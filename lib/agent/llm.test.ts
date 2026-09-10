@@ -107,6 +107,24 @@ test('json_object fallback 재시도에는 JSON 응답 지시가 포함된다', 
   assert.ok(messages.some((message) => message.content.toLowerCase().includes('json')));
 });
 
+test('json_object로 시작한 요청도 JSON 응답 지시를 포함한다', async () => {
+  setEnv('https://direct-json.example.test', 'key', 'direct-json-model');
+  let body: Record<string, unknown> | undefined;
+  const fetchImpl = async (_input: RequestInfo | URL, init?: RequestInit) => {
+    body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+    return new Response(JSON.stringify({ choices: [{ message: { role: 'assistant', content: '{"ok":true}' } }] }), { status: 200 });
+  };
+
+  const result = await callLlm({
+    messages: [{ role: 'user', content: '질문' }],
+    response_format: { type: 'json_object' },
+  }, fetchImpl);
+
+  assert.equal(result.error, undefined);
+  const messages = body?.messages as { content: string }[];
+  assert.ok(messages.some((message) => message.content.toLowerCase().includes('json')));
+});
+
 test('temperature가 원인인 400이면 temperature 없이 한 번만 재시도한다', async () => {
   setEnv('https://fallback-temperature.example.test', 'key', 'temperature-fallback-model');
   const bodies: Record<string, unknown>[] = [];

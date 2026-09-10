@@ -155,3 +155,11 @@ Agent 질문이 `LLM HTTP 400`으로 실패하며, `json_object` 응답 형식 �
 ### 해결
 
 `json_schema` fallback 시 JSON 지시 system message를 한 번 추가하도록 수정했습니다. 기존 messages에 이미 JSON 지시가 있으면 중복 추가하지 않습니다.
+
+### 추가 원인
+
+Tool 실행 후 다음 라운드처럼 호출자가 처음부터 `json_object`를 지정하는 경로에서는 fallback 보정이 실행되지 않았습니다.
+
+### 추가 해결
+
+모든 `json_object` 요청을 전송하기 전에 messages에 JSON 응답 지시가 있는지 확인하고, 없으면 system message를 추가하도록 보강했습니다.

@@ -168,6 +168,11 @@ function isJsonSchema(body: Record<string, unknown>): boolean {
   return responseFormat !== null && typeof responseFormat === 'object' && (responseFormat as Record<string, unknown>).type === 'json_schema';
 }
 
+function isJsonObject(body: Record<string, unknown>): boolean {
+  const responseFormat = body.response_format;
+  return responseFormat !== null && typeof responseFormat === 'object' && (responseFormat as Record<string, unknown>).type === 'json_object';
+}
+
 function withJsonInstruction(body: Record<string, unknown>): Record<string, unknown> {
   const messages = Array.isArray(body.messages) ? body.messages as ChatMessage[] : [];
   const hasJsonInstruction = messages.some((message) => typeof message.content === 'string' && message.content.toLowerCase().includes('json'));
@@ -191,6 +196,7 @@ export async function callLlm(
   if (!model) return errorResult('OPENAI_MODEL 환경변수가 없습니다.');
 
   let body = makeBody(request);
+  if (isJsonObject(body)) body = withJsonInstruction(body);
   const memoryKey = `${baseUrl}|${model}`;
   const url = `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
   const timeoutMs = options.timeoutMs ?? 60_000;

@@ -49,3 +49,11 @@ test('Agent Tool은 Supabase를 직접 조회하지 않고 scm을 동적으로 i
   assert.doesNotMatch(source, new RegExp(forbiddenClientName));
   assert.match(source, /await import\(['"]\.\.\/scm(?:\.ts)?['"]\)/);
 });
+
+test('출고 추이 Tool은 analytics의 저장 결과 뷰를 조회한다', () => {
+  const source = readFileSync(join(process.cwd(), 'lib/scm.ts'), 'utf8');
+  const shipmentFunction = source.slice(source.indexOf('export async function getShipmentTrend'));
+
+  assert.match(shipmentFunction, /from\('v_shipment_trend'\)/);
+  assert.doesNotMatch(shipmentFunction, /from\('v_shipment_by_hoc'\)/);
+});

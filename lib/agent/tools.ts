@@ -124,7 +124,7 @@ function roleAllowed(role: string, roles: AgentRole[]): boolean {
 export const agentTools: AgentTool[] = [
   {
     name: 'getShipmentTrend',
-    description: 'v_shipment_by_hoc에서 품목별 월간 출고 추이와 저장된 이동평균을 조회합니다.',
+    description: 'analytics.v_shipment_trend에서 품목별 월간 출고 추이와 저장된 이동평균을 조회합니다.',
     parameters: itemParameters,
     roles: ['USER', 'ADMIN'],
     async run(input, role = 'USER') {

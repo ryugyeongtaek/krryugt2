@@ -137,7 +137,7 @@ export async function getBacktestRuns() {
 export async function getShipmentTrend(itemCode?: string): Promise<{ rows: ShipmentTrend[]; error: string | null }> {
   try {
     const supabase = await createSupabaseServerClient();
-    let query = supabase.schema('analytics').from('v_shipment_by_hoc').select('*').order('item_code').order('ym');
+    let query = supabase.schema('analytics').from('v_shipment_trend').select('*').order('item_code').order('last_ym');
     if (itemCode) query = query.eq('item_code', itemCode);
     const { data, error } = await query;
     if (error) return { rows: [], error: error.message };

@@ -127,3 +127,17 @@ Guardrail 숫자 추출기가 수량·지표 숫자와 기간을 구분하지 �
 ### 해결
 
 숫자 뒤에 `개월` 또는 `개월간`이 이어지는 기간 표현은 수치 대조 대상에서 제외했습니다. 재현 테스트를 먼저 실패시킨 뒤 최소 수정했으며, 정상 수치·조작 수치 검증 테스트를 다시 통과시켰습니다.
+
+## Agent 출고 추이 조회 실패 (2026-09-10)
+
+### 증상
+
+Agent 질문 결과가 `CALCULATION_UNAVAILABLE`로 표시되고, `analytics.v_shipment_by_hoc`를 스키마 캐시에서 찾을 수 없다는 오류가 발생했습니다.
+
+### 원인
+
+`core.v_shipment_by_hoc`는 XCN 연계를 위한 원천 집계 뷰이고, Agent가 조회해야 하는 화면용 결과 뷰는 `analytics.v_shipment_trend`입니다. 조회 함수가 존재하지 않는 `analytics.v_shipment_by_hoc`를 직접 요청하고 있었습니다.
+
+### 해결
+
+`getShipmentTrend`가 `analytics.v_shipment_trend`를 조회하도록 수정하고 Agent Tool 설명도 실제 화면용 뷰와 일치시켰습니다. 화면용 analytics 뷰는 원천 `core.v_shipment_by_hoc`를 내부에서 사용하므로 XCN 합산 규칙도 유지됩니다.
